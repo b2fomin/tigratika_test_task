@@ -1,22 +1,10 @@
 <template>
-    <TableComponent />
+    <TableComponent :columns="columns"/>
 </template>
 
-<script lang="ts">
-    interface IRowData {
-        name: string,
-        amount: int,
-        source: string,
-        lazer: int,
-        welding: int,
-        electricity: int
-    };
-
-    import TableComponent from './Table.vue';
-    export default {
-        props: {
-            columns: Array<string>,
-            row_data: Array<IRowData>
-        }
-    };
+<script setup lang="ts">
+    import TableComponent from './Table/Table.vue';
+    import { IRowData } from './Table/TableTypes';
+    import { ref } from 'vue';
+    const columns = ref(['Наименование', 'Цена']);
 </script>
