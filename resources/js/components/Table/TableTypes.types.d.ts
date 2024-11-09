@@ -1,8 +1,15 @@
-export interface IRowData {
+export interface IRowGroupData {
     name: string,
-    amount: int,
+    amount: number,
     source: string,
-    lazer: int,
-    welding: int,
-    electricity: int
-};
+    lazer: number,
+    welding: number,
+    electricity: number,
+    id?: number
+}
+
+export interface IRowSubGroupData {
+    name: string,
+    amount: number,
+    source: string
+}

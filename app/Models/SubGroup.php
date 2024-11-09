@@ -11,6 +11,6 @@ class SubGroup extends Model
     protected $guarded = False;
     
     public function group() {
-        $this->belongsTo('group');
+        $this->belongsTo(Group::class);
     }
 }

@@ -16,4 +16,8 @@ class GroupService {
                 ],
             'data' => $res]);
     }
+
+    public function sub_groups(int $id) {
+        return response()->json(Group::findOrFail($id)->sub_groups()->get());
+    }
 };

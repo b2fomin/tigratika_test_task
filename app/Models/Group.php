@@ -10,6 +10,6 @@ class Group extends Model
     use HasFactory;
     protected $guarded = False;
     public function sub_groups() {
-        return $this->hasMany('sub_group');
+        return $this->hasMany(SubGroup::class);
     }
 }

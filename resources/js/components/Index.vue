@@ -6,13 +6,13 @@
 
 <script setup lang="ts">
     import TableComponent from './Table/Table.vue';
-    import { IRowData } from './Table/TableTypes.types';
+    import { IRowGroupData } from './Table/TableTypes.types';
     import Pagination from 'v-pagination-3';
     import { ref, Ref } from 'vue';
     import axios from 'axios';
 
     let columns: Ref<Array<string>> = ref([]);
-    let data: Ref<Array<IRowData>> = ref([]);
+    let data: Ref<Array<IRowGroupData>> = ref([]);
 
     let params = new URLSearchParams(document.location.search);
     let page = ref(Number(params.get('page')));
@@ -41,6 +41,7 @@
             window.history.replaceState(document.title, Object(), new_url);
         });    
     }
+
     on_paginate();
     
 </script>
