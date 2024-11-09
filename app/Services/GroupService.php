@@ -5,9 +5,15 @@ namespace App\Services;
 use App\Models\Group;
 
 class GroupService {
-    public function index() {
-        $res = Group::all();
+    public function index(int $page, int $per_page) {
+        $res = Group::paginate(perPage: $per_page, page: $page);
         $res = $res->makeHidden(['created_at', 'updated_at']);
-        return response()->json($res);
+        return response([
+            'meta' => [
+            'page' => $page,
+            'per_page' => $per_page,
+            'total_number' => Group::all()->count(),
+                ],
+            'data' => $res]);
     }
 };
