@@ -11,6 +11,7 @@ class IndexController extends BaseController
         $request = $request->query();
         $page = isset($request['page']) ? $request['page'] : 1;
         $per_page = isset($request['per_page']) ? $request['per_page'] : 1;
-        return $this->service->index($page, $per_page);
+        $order = $request['order'];
+        return $this->service->index($page, $per_page, $order);
     }
 }

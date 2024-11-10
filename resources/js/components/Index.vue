@@ -1,6 +1,8 @@
 <template>
     <TableComponent :columns="columns"
-                    :row_data="data"/>
+                    :row_data="data"
+                    @move-cell-up="onMoveCellUp"
+                    @move-cell-down="onMoveCellDown"/>
     <Pagination v-model="page" :records="total_pages" :perPage="per_page" @paginate="on_paginate"/>
 </template>
 
@@ -8,8 +10,13 @@
     import TableComponent from './Table/Table.vue';
     import { IRowGroupData } from './Table/TableTypes.types';
     import Pagination from 'v-pagination-3';
-    import { ref, Ref } from 'vue';
+    import { ref, Ref, defineEmits } from 'vue';
     import axios from 'axios';
+
+    defineEmits<{
+        'move-cell-up': [index: number],
+        'move-cell-down': [index: number]
+    }>();
 
     let columns: Ref<Array<string>> = ref([]);
     let data: Ref<Array<IRowGroupData>> = ref([]);
@@ -20,10 +27,31 @@
     let total_pages = ref(0);
     const base_url: string = window.location.origin;
 
+    function range(start, end) {
+        if(start === end) return [start];
+        return [start, ...range(start + 1, end)];
+    }
+
+    const order = ref(range(0, per_page.value - 1))
+
+    async function onMoveCellUp(index: number) {
+        let tmp = order.value[index];
+        order.value[index] = order.value[index + 1];
+        order.value[index + 1] = tmp;
+        on_paginate();
+    }
+
+    async function onMoveCellDown(index: number) {
+        let tmp = order.value[index];
+        order.value[index] = order.value[index - 1];
+        order.value[index - 1] = tmp;
+        on_paginate();
+    }
     async function on_paginate() {
         columns.value = [];
         data.value = [];
-        await axios.get(`./api/v1/group?page=${page.value}&per_page=${per_page.value}`)
+        
+        await axios.get(`./api/v1/group`, {params: {order: order.value, page: page.value, per_page: per_page.value}})
         .then((response) => {
             let new_url = base_url;
             response = response['data'];
@@ -39,7 +67,7 @@
             data.value = response['data'];
 
             window.history.replaceState(document.title, Object(), new_url);
-        });    
+        });            
     }
 
     on_paginate();
