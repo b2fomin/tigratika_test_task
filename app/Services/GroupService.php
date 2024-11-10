@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Group;
+use DB;
 use Response;
 
 class GroupService {
@@ -34,10 +35,12 @@ class GroupService {
             $group = Group::findOrFail($id);
             $group->sub_groups()->delete();
             $group->delete();
+            Group::where('id', '>', $id)->increment('id', -1);
             return response(['success' => true]);
         }
         catch (\Exception $e){
             return response(['success' => false, 'err_msg' => $e], status: 404);
         }
+
     }
 };

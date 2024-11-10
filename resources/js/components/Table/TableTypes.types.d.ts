@@ -5,7 +5,6 @@ export interface IRowGroupData {
     lazer: number,
     welding: number,
     electricity: number,
-    id?: number
 }
 
 export interface IRowSubGroupData {

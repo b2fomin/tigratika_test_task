@@ -18,14 +18,15 @@
 </template>
 
 <script setup lang="ts">
-    import { defineProps, ref, Ref, onUpdated, defineEmits, onMounted } from 'vue';
+    import { defineProps, ref, Ref, defineEmits } from 'vue';
     import { IRowGroupData, IRowSubGroupData } from './TableTypes.types';
     import axios from 'axios';
 
     const props = defineProps<{
         data: IRowGroupData,
         total: number,
-        current: number
+        current: number,
+        id: number
     }>();
 
     const emit = defineEmits<{
@@ -36,18 +37,10 @@
 
     let is_hidden: Ref<Boolean> = ref(true);
     let sub_groups: Array<IRowSubGroupData> = [];
-    let id = ref();
-    let extract_id = () => {
-        if (id.value === undefined) {
-            id.value = props.data.id !== undefined ? props.data.id : 0;
-            delete props.data.id;
-        }
-    }
-    onUpdated(extract_id);
-    onMounted(extract_id);
+
     async function subGroupClick() {
         if (is_hidden.value) {
-            await axios.get(`./api/v1/group/${id.value}/subgroups`)
+            await axios.get(`./api/v1/group/${props.id}/subgroups`)
             .then((response) => {
                 
                 for (let sub_group of response['data']) {                    
@@ -63,11 +56,10 @@
     }
 
     async function onDelete() {
-        axios.delete(`./api/v1/group/${id.value}`)
+        axios.delete(`./api/v1/group/${props.id}`)
         .then((response) => {
             if (response['data']['success']) {
                 emit('delete-row', props.current);
-                id.value+=1
             } else {
                 console.log(response['err_msg']);                
             }

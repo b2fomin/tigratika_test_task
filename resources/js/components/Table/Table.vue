@@ -1,7 +1,8 @@
 <template>
     <table class="table table-striped">
         <HeaderRow :columns="Object.keys(response['data']['data'][0])" />
-        <BodyRow v-for="row in response['data']['data']" :data="row" 
+        <BodyRow v-for="row in response['data']['data']" :data="delete row.id && row" 
+        :id="order[response['data']['data'].indexOf(row)]+response['data']['meta']['page']+(response['data']['meta']['page']-1)*response['data']['meta']['per_page']" 
         :current="response['data']['data'].indexOf(row)" :total="response['data']['data'].length" 
         @move-cell-up="onMoveCellUp"
         @move-cell-down="onMoveCellDown"
@@ -25,7 +26,7 @@
     const props = defineProps<{
         response: AxiosResponse
         }>();
-
+    
     const emit = defineEmits<{
         'move-cell-up': [index: number],
         'move-cell-down': [index: number],
@@ -38,19 +39,19 @@
     }
 
     const base_url: string = window.location.origin;
-    const order = range(0, props.response['data']['meta']['per_page']);
+    const order = ref(range(0, props.response['data']['meta']['per_page']));
 
     async function onMoveCellUp(index: number) {
-        let tmp = order[index];
-        order[index] = order[index + 1];
-        order[index + 1] = tmp;
+        let tmp = order.value[index];
+        order.value[index] = order.value[index + 1];
+        order.value[index + 1] = tmp;
         onPaginate();
     }
 
     async function onMoveCellDown(index: number) {
-        let tmp = order[index];
-        order[index] = order[index - 1];
-        order[index - 1] = tmp;
+        let tmp = order.value[index];
+        order.value[index] = order.value[index - 1];
+        order.value[index - 1] = tmp;        
         onPaginate();
     }
 
@@ -63,15 +64,16 @@
 
             window.history.replaceState(document.title, Object(), new_url);
 
-            emit('receive-data', order);
+            emit('receive-data', order.value);
 
     }
 
     async function onDelete(index: number) {
-        order.splice(index, 1);
-        for (let i = index-1; i < order.length; ++i) {
-            --order[i];
+        order.value.splice(index, 1);
+        for (let i = index; i < order.value.length; ++i) {
+            --order.value[i];
         }
-        emit('receive-data', order);
+        
+        emit('receive-data', order.value);
     }
 </script>
