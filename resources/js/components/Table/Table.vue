@@ -4,14 +4,15 @@
         <BodyRow v-for="row in response['data']['data']" :data="row" 
         :current="response['data']['data'].indexOf(row)" :total="response['data']['data'].length" 
         @move-cell-up="onMoveCellUp"
-        @move-cell-down="onMoveCellDown"/>
+        @move-cell-down="onMoveCellDown"
+        @delete-row="onDelete"/>
+    </table>
     <footer>
         <Pagination v-model="response['data']['meta']['page']" 
                             :records="response['data']['meta']['total_number']"
                             :perPage="response['data']['meta']['per_page']"
                              @paginate="onPaginate"/>
     </footer>
-    </table>
 </template>
 
 <script setup lang="ts">
@@ -28,28 +29,28 @@
     const emit = defineEmits<{
         'move-cell-up': [index: number],
         'move-cell-down': [index: number],
-        'receive-data': [order: Ref]
+        'receive-data': [order: Array<number>],
+        'delete-row': [index: number]
     }>();
     
-    function range(start, end) {
-        if(start === end) return [start];
-        return [start, ...range(start + 1, end)];
+    function range(start, stop, step=1) {
+        return Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step))
     }
 
     const base_url: string = window.location.origin;
-    const order = ref(range(0, props.response['data']['meta']['per_page'] - 1));
+    const order = range(0, props.response['data']['meta']['per_page']);
 
     async function onMoveCellUp(index: number) {
-        let tmp = order.value[index];
-        order.value[index] = order.value[index + 1];
-        order.value[index + 1] = tmp;
+        let tmp = order[index];
+        order[index] = order[index + 1];
+        order[index + 1] = tmp;
         onPaginate();
     }
 
     async function onMoveCellDown(index: number) {
-        let tmp = order.value[index];
-        order.value[index] = order.value[index - 1];
-        order.value[index - 1] = tmp;
+        let tmp = order[index];
+        order[index] = order[index - 1];
+        order[index - 1] = tmp;
         onPaginate();
     }
 
@@ -62,7 +63,15 @@
 
             window.history.replaceState(document.title, Object(), new_url);
 
-            emit('receive-data', order.value)
+            emit('receive-data', order);
 
+    }
+
+    async function onDelete(index: number) {
+        order.splice(index, 1);
+        for (let i = index-1; i < order.length; ++i) {
+            --order[i];
+        }
+        emit('receive-data', order);
     }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <thead>
         <tr>
-            <th v-for="column in columns.slice(1)">{{ column }}</th>
+            <th v-for="column in columns">{{ column }}</th>
         </tr>
     </thead>
 </template>
