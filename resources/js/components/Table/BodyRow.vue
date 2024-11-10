@@ -2,8 +2,8 @@
     <tr>
         <td style='white-space: nowrap' v-for="(column, index) in data">
             <div class="btn-group-vertical" v-if="index === 'name'">
-            <button @click="() => this.$emit('move-cell-down', current)" class="btn btn-small btn-light" :disabled="current === 0"><i class="bi bi-caret-up-square-fill"></i></button>
-            <button @click="() => this.$emit('move-cell-up', current)" class="btn btn-small btn-light" :disabled="current === total - 1"><i class="bi bi-caret-down-square-fill"></i></button></div>
+            <button @click="() => emit('move-cell-down', current)" class="btn btn-small btn-light" :disabled="current === 0"><i class="bi bi-caret-up-square-fill"></i></button>
+            <button @click="() => emit('move-cell-up', current)" class="btn btn-small btn-light" :disabled="current === total - 1"><i class="bi bi-caret-down-square-fill"></i></button></div>
             {{ column }}<button v-if="index === 'name'" class="btn btn-light"
             @click="subGroupClick">
             <i :class="is_hidden ? 'bi bi-chevron-down' : 'bi bi-chevron-up'"></i></button></td>
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-    import { defineProps, ref, Ref, onMounted, defineEmits } from 'vue';
+    import { defineProps, ref, Ref, onUpdated, defineEmits, onMounted } from 'vue';
     import { IRowGroupData, IRowSubGroupData } from './TableTypes.types';
     import axios from 'axios';
 
@@ -24,22 +24,23 @@
         current: number
     }>();
 
-    defineEmits<{
+    const emit = defineEmits<{
         'move-cell-up': [index: number],
         'move-cell-down': [index: number]
     }>();
 
     let is_hidden: Ref<Boolean> = ref(true);
     let sub_groups: Array<IRowSubGroupData> = [];
-    let id = 0;
-
-    onMounted(() => {
-        id = props.data.id !== undefined ? props.data.id : 0;
+    let id = ref(0);
+    let extract_id = () => {
+        id.value = props.data.id !== undefined ? props.data.id : 0;
         delete props.data.id;
-    });
+    }
+    onUpdated(extract_id);
+    onMounted(extract_id)
     async function subGroupClick() {
         if (is_hidden.value) {
-            await axios.get(`./api/v1/group/${id}/subgroups`)
+            await axios.get(`./api/v1/group/${id.value}/subgroups`)
             .then((response) => {
                 
                 for (let sub_group of response['data']) {                    
