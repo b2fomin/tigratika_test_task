@@ -69,11 +69,13 @@
     }
 
     async function onDelete(index: number) {
-        order.value.splice(index, 1);
-        for (let i = index; i < order.value.length; ++i) {
-            --order.value[i];
+        let id = order.value.splice(index, 1);
+        for (let i = 0; i < order.value.length; ++i) {
+            if (order.value[i] > id) {
+                --order.value[i];
+            }
         }
-        
+        order.value.push(order.value[order.value.length - 1] + 1)
         emit('receive-data', order.value);
     }
 </script>
