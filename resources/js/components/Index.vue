@@ -16,8 +16,19 @@
 
     async function getData(order) {
         let params = new URLSearchParams(document.location.search);
-        let page = Number(params.get('page'));
-        let per_page = Number(params.get('per_page'));
+        let page, per_page;
+        if (params.has('page')) {
+            page = Number(params.get('page'))
+        } else {
+            page = 1;
+            params.set('page', page);
+        }
+        if (params.has('per_page')) {
+            per_page = Number(params.get('per_page'))
+        } else {
+            per_page = 1;
+            params.set('per_page', page);
+        }
         await axios.get(`./api/v1/group`, {params: {order: order, page: page, per_page: per_page}})
         .then((response_from) => {
             response.value = response_from;
