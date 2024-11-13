@@ -5,7 +5,7 @@ services:
     container_name: laravelapp
     build:
       context: ../
-      dockerfile: ./deploy/Dockerfile
+      dockerfile: ../Dockerfile
     env_file: ../.env
     volumes:
       - ../:/var/www/html
